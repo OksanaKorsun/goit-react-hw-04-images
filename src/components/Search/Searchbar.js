@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import {
   SearchHeader,
   SearchForm,
@@ -8,69 +8,36 @@ import {
 import { IoIosSearch } from 'react-icons/io';
 import toast from 'react-hot-toast';
 
-export class Searchbar extends Component {
-  state = {
-    searchImage: '',
-  };
-  searchValueChange = event => {
-    this.setState({ searchImage: event.target.value.toLowerCase() });
-  };
-
-  handleSubmit = event => {
+export const Searchbar = ({ onSubmit }) => {
+  const [searchImage, setSearchImage] = useState('');
+  const searchValueChange = event =>
+    setSearchImage(event.target.value.toLowerCase());
+  const handleSubmit = event => {
     event.preventDefault();
-    if (this.state.searchImage.trim() === '') {
+    if (searchImage.trim() === '') {
       toast.error('Please enter a query in the search field.');
       return;
     }
-    this.props.onSubmit(this.state.searchImage);
-    this.setState({ searchImage: '' });
+    onSubmit(searchImage);
+    setSearchImage('');
   };
-  render() {
-    const { searchImage } = this.state;
-    return (
-      <SearchHeader>
-        <SearchForm onSubmit={this.handleSubmit}>
-          <SearchButton type="submit">
-            <IoIosSearch size="25" />
-          </SearchButton>
+  return (
+    <SearchHeader>
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchButton type="submit">
+          <IoIosSearch size="25" />
+        </SearchButton>
 
-          <SearchInput
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            onChange={this.searchValueChange}
-            name="searchImage"
-            value={searchImage}
-          />
-        </SearchForm>
-      </SearchHeader>
-    );
-  }
-}
-// import { Formik } from 'formik';
-// import{Form, Field, SearchButton } from './Searchbar.styled'
-
-// export const Searchbar = ({ onSubmit }) => {
-//   return (
-//     <Formik
-//       initialValues={{
-//         searchImage: '',
-//       }}
-//       onSubmit={(values, actions) => {
-//         onSubmit(values);
-//         actions.resetForm();
-//       }}
-//     >
-//       <Form>
-//         <SearchButton type="submit"></SearchButton>
-//         <Field
-//           name="searchImage"
-//           autoComplete="off"
-//           autoFocus
-//           placeholder="Search images and photos"
-//         />
-//       </Form>
-//     </Formik>
-//   );
-// };
+        <SearchInput
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          onChange={searchValueChange}
+          name="searchImage"
+          value={searchImage}
+        />
+      </SearchForm>
+    </SearchHeader>
+  );
+};

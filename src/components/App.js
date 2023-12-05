@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from './Button/Button';
 import { GlobalStyle } from './GlobalStyle';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -8,86 +8,63 @@ import { Container } from './App.styled';
 import { Loader } from './Loader/Loader';
 import toast, { Toaster } from 'react-hot-toast';
 
-export class App extends Component {
-  state = {
-    images: [],
-    query: '',
-    page: 1,
-    totalPages: null,
-    isLoading: false,
-    error: false,
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.query !== this.state.query ||
-      prevState.page !== this.state.page
-    ) {
-      try {
-        // const timeId = Date.now();
-        const { query, page, totalPages } = this.state;
-        // const searchQwery = query.slice(String(timeId).length + 1);
-        const searchQwery = query.split('/').pop();
-        this.setState({ isLoading: true, error: false });
+  useEffect(() => {
+    async function getImages() {
+      const searchQwery = query.split('/').pop();
+      setIsLoading(true);
+      setError(false);
+      const findImages = await fetchImages(searchQwery, page);
+      if (findImages.totalHits === 0) {
+        toast.error(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        return;
+      }
 
-        const findImages = await fetchImages(searchQwery, page);
-        if (findImages.totalHits === 0) {
-          toast.error(
-            'Sorry, there are no images matching your search query. Please try again.'
-          );
-          return;
-        }
+      setImages(prevImages => [...prevImages, ...findImages.hits]);
+      setTotalPages(Math.ceil(findImages.totalHits / 12));
 
-        if (findImages.hits.length) {
-          this.setState(prevState => {
-            return {
-              images: [...prevState.images, ...findImages.hits],
-              totalPages: Math.ceil(findImages.totalHits / 12),
-            };
-          });
-          if (page >= totalPages) {
-            toast.info('No more images to load.');
-          }
-        }
-      } catch (error) {
-        this.setState({ error: true });
-      } finally {
-        this.setState({ isLoading: false });
+      if (page >= totalPages) {
+        toast.info('No more images to load.');
       }
     }
-  }
+    try {
+      getImages();
+    } catch (error) {
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [query, page, totalPages]);
 
-  handleLoadMore = () => {
-    this.setState(prevState => {
-      return {
-        page: prevState.page + 1,
-      };
-    });
-  };
+  const handleLoadMore = () => setPage(prevPage => prevPage + 1);
 
-  handleSubmit = newQuery => {
+  const handleSubmit = newQuery => {
     const timeId = Date.now();
-    this.setState({
-      query: `${timeId}/${newQuery}`,
-      page: 1,
-      images: [],
-      totalPages: null,
-    });
+    setQuery(`${timeId}/${newQuery}`);
+    setPage(1);
+    setImages([]);
+    setTotalPages(null);
   };
 
-  render() {
-    const { images, isLoading, page, error, totalPages } = this.state;
-    return (
-      <Container>
-        <Searchbar onSubmit={this.handleSubmit}></Searchbar>
-        {error && <p>{error}</p>}
-        {isLoading && <Loader />}
-        {images.length > 0 && <ImageGallery images={images}></ImageGallery>}
+  return (
+    <Container>
+      <Searchbar onSubmit={handleSubmit}></Searchbar>
+      {error && <p>{error}</p>}
+      {isLoading && <Loader />}
+      {images.length > 0 && <ImageGallery images={images}></ImageGallery>}
 
-        {page < totalPages && <Button onClick={this.handleLoadMore}></Button>}
-        <GlobalStyle />
-        <Toaster />
-      </Container>
-    );
-  }
-}
+      {page < totalPages && <Button onClick={handleLoadMore}></Button>}
+      <GlobalStyle />
+      <Toaster />
+    </Container>
+  );
+};
