@@ -18,31 +18,32 @@ export const App = () => {
 
   useEffect(() => {
     async function getImages() {
-      const searchQwery = query.split('/').pop();
-      setIsLoading(true);
-      setError(false);
-      const findImages = await fetchImages(searchQwery, page);
-      if (findImages.totalHits === 0) {
-        toast.error(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        return;
-      }
+      try {
+        console.log(query);
+        const searchQwery = query.split('/').pop();
+        setIsLoading(true);
+        setError(false);
+        const findImages = await fetchImages(searchQwery, page);
+        if (findImages.totalHits === 0) {
+          toast.error(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+          return;
+        }
 
-      setImages(prevImages => [...prevImages, ...findImages.hits]);
-      setTotalPages(Math.ceil(findImages.totalHits / 12));
+        setImages(prevImages => [...prevImages, ...findImages.hits]);
+        setTotalPages(Math.ceil(findImages.totalHits / 12));
 
-      if (page >= totalPages) {
-        toast.info('No more images to load.');
+        if (page >= totalPages) {
+          toast.info('No more images to load.');
+        }
+      } catch (error) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     }
-    try {
-      getImages();
-    } catch (error) {
-      setError(true);
-    } finally {
-      setIsLoading(false);
-    }
+    getImages();
   }, [query, page, totalPages]);
 
   const handleLoadMore = () => setPage(prevPage => prevPage + 1);
