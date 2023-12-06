@@ -15,7 +15,7 @@ export const App = () => {
   const [totalPages, setTotalPages] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [toastDisplayed, setToastDisplayed] = useState(false);
+  // const [toastDisplayed, setToastDisplayed] = useState(false);
 
   useEffect(() => {
     if (query === '') {
@@ -57,20 +57,18 @@ export const App = () => {
 
   return (
     <Container>
-  <Searchbar onSubmit={handleSubmit}></Searchbar>
-  {error && <p>{error}</p>}
-  {isLoading && <Loader />}
-  {images.length > 0 && <ImageGallery images={images}></ImageGallery>}
-  {images.length > 0 &&
-    (page < totalPages ? (
-      <Button onClick={handleLoadMore}></Button>
-    ) : (
-      !toastDisplayed && (
-        toast('No more images to load.') && setToastDisplayed(true)
-      )
-    ))}
-  <GlobalStyle />
-  <Toaster position="top-right" reverseOrder={false} />
-</Container>
+      <Searchbar onSubmit={handleSubmit}></Searchbar>
+      {error && <p>{error}</p>}
+      {isLoading && <Loader />}
+      {images.length > 0 && <ImageGallery images={images}></ImageGallery>}
+      {images.length > 0 &&
+        (page < totalPages ? (
+          <Button onClick={handleLoadMore}></Button>
+        ) : (
+          toast('No more images to load.')
+        ))}
+      <GlobalStyle />
+      <Toaster position="top-right" reverseOrder={false} />
+    </Container>
   );
 };
