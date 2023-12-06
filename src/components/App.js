@@ -64,10 +64,10 @@ export const App = () => {
         (page < totalPages ? (
           <Button onClick={handleLoadMore}></Button>
         ) : (
-          toast.info('No more images to load.')
+          toast.error('No more images to load.')
         ))}
       <GlobalStyle />
-      <Toaster />
+      <Toaster position="top-right" reverseOrder={false} />
     </Container>
   );
 };
