@@ -17,12 +17,15 @@ export const App = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (query === '') {
+      return;
+    }
+
     async function getImages() {
       try {
-        console.log(query);
-        const searchQwery = query.split('/').pop();
         setIsLoading(true);
         setError(false);
+        const searchQwery = query.split('/').pop();
         const findImages = await fetchImages(searchQwery, page);
         if (findImages.totalHits === 0) {
           toast.error(
@@ -30,13 +33,8 @@ export const App = () => {
           );
           return;
         }
-
         setImages(prevImages => [...prevImages, ...findImages.hits]);
         setTotalPages(Math.ceil(findImages.totalHits / 12));
-
-        if (page >= totalPages) {
-          toast.info('No more images to load.');
-        }
       } catch (error) {
         setError(true);
       } finally {
@@ -44,7 +42,7 @@ export const App = () => {
       }
     }
     getImages();
-  }, [query, page, totalPages]);
+  }, [query, page]);
 
   const handleLoadMore = () => setPage(prevPage => prevPage + 1);
 
@@ -62,8 +60,12 @@ export const App = () => {
       {error && <p>{error}</p>}
       {isLoading && <Loader />}
       {images.length > 0 && <ImageGallery images={images}></ImageGallery>}
-
-      {page < totalPages && <Button onClick={handleLoadMore}></Button>}
+      {images.length > 0 &&
+        (page < totalPages ? (
+          <Button onClick={handleLoadMore}></Button>
+        ) : (
+          toast.info('No more images to load.')
+        ))}
       <GlobalStyle />
       <Toaster />
     </Container>

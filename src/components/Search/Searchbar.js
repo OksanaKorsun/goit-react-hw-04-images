@@ -8,6 +8,7 @@ import {
 import { IoIosSearch } from 'react-icons/io';
 import toast from 'react-hot-toast';
 
+
 export const Searchbar = ({ onSubmit }) => {
   const [searchImage, setSearchImage] = useState('');
   const searchValueChange = event =>
