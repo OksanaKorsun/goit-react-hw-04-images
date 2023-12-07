@@ -36,6 +36,9 @@ export const App = () => {
         }
         setImages(prevImages => [...prevImages, ...findImages.hits]);
         setTotalPages(Math.ceil(findImages.totalHits / 12));
+        if (page >= Math.ceil(findImages.totalHits / 12)) {
+          toast('No more images to load.')
+        }
       } catch (error) {
         setError(true);
       } finally {
@@ -61,12 +64,7 @@ export const App = () => {
       {error && <p>{error}</p>}
       {isLoading && <Loader />}
       {images.length > 0 && <ImageGallery images={images}></ImageGallery>}
-      {images.length > 0 &&
-        (page < totalPages ? (
-          <Button onClick={handleLoadMore}></Button>
-        ) : (
-          toast('No more images to load.')
-        ))}
+      {page < totalPages && <Button onClick={handleLoadMore}></Button>}
       <GlobalStyle />
       <Toaster position="top-right" reverseOrder={false} />
     </Container>
