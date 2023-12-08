@@ -34,10 +34,13 @@ export const App = () => {
           );
           return;
         }
-        setImages(prevImages => [...prevImages, ...findImages.hits]);
-        setTotalPages(Math.ceil(findImages.totalHits / 12));
+        if (findImages.hits.length) {
+          setImages(prevImages => [...prevImages, ...findImages.hits]);
+          setTotalPages(Math.ceil(findImages.totalHits / 12));
+        }
+
         if (page >= Math.ceil(findImages.totalHits / 12)) {
-          toast('No more images to load.')
+          toast('No more images to load.');
         }
       } catch (error) {
         setError(true);
