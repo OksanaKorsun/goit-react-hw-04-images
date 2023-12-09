@@ -15,7 +15,6 @@ export const App = () => {
   const [totalPages, setTotalPages] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  // const [toastDisplayed, setToastDisplayed] = useState(false);
 
   useEffect(() => {
     if (query === '') {
